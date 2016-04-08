@@ -14,35 +14,44 @@
 
 (def ^:const mapping-table (generate-mapping-table))
 
-(defn- hex-char-to-binary
-  [hex]
-  (let [digit (Character/digit hex 16)]
-    (->> digit 
-         Integer/toBinaryString
-         Integer/parseInt
-         (format "%04d"))))
-
-(defn- hex-to-binary-string
-  [hex-str]
-  (clojure.string/join (map hex-char-to-binary hex-str)))
+(defn- byte->binary-str
+  [val]
+  (->> val
+       Integer/toBinaryString
+       Integer/parseInt
+       (format "%08d")))
 
 (defn- partition-to-6-complements
-  [binary-str]
-  (->> binary-str
+  [byte-array]
+  (->> byte-array
        (partition 6 6 (repeat \0))
        (map clojure.string/join)))
 
-(defn- map-to-base64-index
+(defn byte-array->binary-str
+  [byte-array]
+  (clojure.string/join (map byte->binary-str byte-array)))
+
+(defn byte-array->base64-str
   [input]
   (->> input
-       hex-to-binary-string
+       byte-array->binary-str
        partition-to-6-complements
-       (map #(Integer/parseInt % 2))))
+       (map #(Integer/parseInt % 2))
+       (map #(get mapping-table %))
+       clojure.string/join))
+
+(defn hex-str->byte-array
+  [hex-str]
+  (->> hex-str
+       (partition 2 2 (repeat \0))
+       (map clojure.string/join)
+       (map #(Byte/parseByte % 16))))
 
 (defn hex->base64
   [input]
-  (let [numbers (map-to-base64-index input)]
-    (clojure.string/join (map #(get mapping-table %) numbers))))
+  (-> input
+      hex-str->byte-array
+      byte-array->base64-str))
 
 (defn -main
   "I don't do a whole lot ... yet."
