@@ -16,19 +16,36 @@
     (is (= \+ (get mapping-table 62)))
     (is (= \\ (get mapping-table 63)))))
 
-(deftest hex-str->byte-array-test
+(deftest my-hex-str->byte-array-test
   (testing "Converts hex strings to byte arrays"
-    (is (= [74] (hex-str->byte-array "4A")))))
+    (is (= [74] (my-hex-str->byte-array "4A")))))
+
+(deftest my-byte-array->binary-str-test
+  (testing "Converts byte array to binary string"
+    (is (= "0100101001010010" (my-byte-array->binary-str [74 82])))))
+
+(deftest my-byte-array->base64-str-test
+  (testing "Converts byte array to base64 string"
+    (is (= "SSc" (my-byte-array->base64-str [73 39])))))
+
+(deftest my-str->base64-test
+  (testing "Converts from str to base64"
+    (is (= "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t" (my-hex->base64 "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d")))))
+
+(deftest hex-str->byte-array-test
+  (testing "Converts a hex string into a byte array"
+    (is (= [74] (vec (hex-str->byte-array "4A"))))))
 
 (deftest byte-array->binary-str-test
   (testing "Converts byte array to binary string"
-    (is (= "0100101001010010" (byte-array->binary-str [74 82])))))
+    (is (= "100101001010010" (byte-array->binary-str [74 82])))))
 
 (deftest byte-array->base64-str-test
   (testing "Converts byte array to base64 string"
-    (is (= "SSc" (byte-array->base64-str [73 39])))))
+    (is (= "SSc=" (byte-array->base64-str [73 39])))))
 
 (deftest str->base64-test
   (testing "Converts from str to base64"
-    (is (= "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t" (hex->base64 "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d")))))
+    (is (= "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t" (hex->base64 "49276d206b696c6c696e6720796f7572206272616;; 96e206c696b65206120706f69736f6e6f7573206d757368726f6f6d
+")))))
 

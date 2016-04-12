@@ -27,29 +27,53 @@
        (partition 6 6 (repeat \0))
        (map clojure.string/join)))
 
-(defn byte-array->binary-str
+(defn my-byte-array->binary-str
   [byte-array]
   (clojure.string/join (map byte->binary-str byte-array)))
 
-(defn byte-array->base64-str
+(defn my-byte-array->base64-str
   [input]
   (->> input
-       byte-array->binary-str
+       my-byte-array->binary-str
        partition-to-6-complements
        (map #(Integer/parseInt % 2))
        (map #(get mapping-table %))
        clojure.string/join))
 
-(defn hex-str->byte-array
+(defn my-hex-str->byte-array
   [hex-str]
   (->> hex-str
        (partition 2 2 (repeat \0))
        (map clojure.string/join)
        (map #(Byte/parseByte % 16))))
 
-(defn hex->base64
+(defn my-hex->base64
   [input]
   (-> input
+      my-hex-str->byte-array
+      my-byte-array->base64-str))
+
+(defn hex-str->byte-array
+  [hex-str]
+  (vec (.toByteArray (BigInteger. hex-str 16))))
+
+(defn byte-array->binary-str
+  [bytes]
+  (let [byte-array (into-array Byte/TYPE bytes)]
+    (-> byte-array
+        (BigInteger.)
+        (.toString 2))))
+
+(defn byte-array->base64-str
+  [bytes]
+  (let [encoder (java.util.Base64/getEncoder)]
+    (->> bytes
+         (into-array Byte/TYPE)
+         (.encodeToString encoder))))
+
+(defn hex->base64
+  [hex-str]
+  (-> hex-str
       hex-str->byte-array
       byte-array->base64-str))
 
